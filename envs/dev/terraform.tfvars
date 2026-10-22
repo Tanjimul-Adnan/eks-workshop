@@ -1,0 +1,6 @@
+region                    = "us-east-2"
+cluster_name              = "workshop-dev"
+kubernetes_version        = "1.31"
+helm_repo_url             = "https://github.com/Tanjimul-Adnan/eks-helm.git"
+helm_repo_path            = "bootstrap"
+helm_repo_target_revision = "main"
