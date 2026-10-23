@@ -99,5 +99,5 @@ output "public_subnets" { value = module.vpc.public_subnets }
 output "private_subnets" { value = module.vpc.private_subnets }
 output "nat_gateway_public_ips" { value = module.vpc.nat_public_ips }
 output "ecr_repository_urls" {
-  value = { for name, repo in aws_ecr_repository.service : name => repo.repository_url }
+  value = { for name, repo in Dockerhub.service : name => repo.repository_url }
 }
