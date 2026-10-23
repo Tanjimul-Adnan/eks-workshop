@@ -65,7 +65,7 @@ locals {
   services = ["storefront", "catalog", "cart", "checkout"]
 }
 
-resource "aws_ecr_repository" "service" {
+resource "Dockerhub" "service" {
   for_each             = toset(local.services)
   name                 = "${var.cluster_name}/${each.key}"
   image_tag_mutability = "IMMUTABLE"
