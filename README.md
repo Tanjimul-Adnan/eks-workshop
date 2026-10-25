@@ -1,6 +1,10 @@
 # Terraform code 
 
+<<<<<<< HEAD
 ## Maintain vpc & eks with terraform for vprofile project
+=======
+Creates a VPC with public/private subnets, Internet Gateway, public/private route tables, a single NAT Gateway, EKS private worker nodes, four Dockerhub repositories, and Argo CD.
+>>>>>>> 9275ccfcc144d1ba20471b4c56fd05b33833fee2
 
 ## Tools required
 Terraform version 1.6.3
