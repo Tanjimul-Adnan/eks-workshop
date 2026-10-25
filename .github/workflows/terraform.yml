@@ -1,34 +1,22 @@
-<<<<<<< HEAD
 name: "eks-terraform"
-=======
-name: "Vprofile IAC"
->>>>>>> 163e0a3481b8d9a7da03cf38ebaacd5e8d9190c7
-on: 
+"on":
   push:
     branches:
      - main
      - stage
     paths:
      - 'terraform/**'
-<<<<<<< HEAD
-  *pull_request:
-   * branches:
-    * - main
-    *paths:
-     *- 'terraform/**' 
-=======
   pull_request:
     branches:
      - main
     paths:
      - 'terraform/**' 
->>>>>>> 163e0a3481b8d9a7da03cf38ebaacd5e8d9190c7
 env:
  AWS_ACCESS_KEY_ID: ${{ secrets.AWS_ACCESS_KEY_ID }}
  AWS_SECRET_ACCESS_KEY: ${{ secrets.AWS_SECRET_ACCESS_KEY }}
  BUCKET_TF_STATE: ${{ secrets.BUCKET_TF_STATE }}  
  AWS_REGION: us-east-2 
- EKS_CLUSTER: vprofile-eks
+ EKS_CLUSTER: eks-workshop-cluster
 
 jobs:
     terraform:
@@ -45,7 +33,7 @@ jobs:
             - name: Setup Terraform
               uses: hashicorp/setup-terraform@v2
               with:
-                terraform_version: 1.6.3
+                terraform_version: 1.14.8
             - name: "Terraform Init"
               id: init
               run: terraform init -backend-config="bucket=$BUCKET_TF_STATE"
