@@ -11,6 +11,7 @@ on:
      - main
     paths:
      - 'terraform/**' 
+  workflow_dispatch:
 env:
  AWS_ACCESS_KEY_ID: ${{ secrets.AWS_ACCESS_KEY_ID }}
  AWS_SECRET_ACCESS_KEY: ${{ secrets.AWS_SECRET_ACCESS_KEY }}
@@ -33,7 +34,7 @@ jobs:
             - name: Setup Terraform
               uses: hashicorp/setup-terraform@v3
               with:
-               terraform_version: 1.9.0 # <-- Update this line to a newer version
+               terraform_version: 1.14.8 # <-- Update this line to a newer version
 
             - name: "Terraform Init"
               id: init
@@ -68,4 +69,4 @@ jobs:
 
             - name: Install Ingress controller
               if: steps.apply.outcome == 'success' && steps.getconfig.outcome == 'success'
-              run: kubectl apply -f https://raw.githubusercontent.com/kubernetes/ingress-nginx/controller-v1.7.0/deploy/static/provider/aws/deploy.yaml 
+              run: kubectl apply -f https://raw.githubusercontent.com/kubernetes/ingress-nginx/controller-v1.7.0/deploy/static/provider/aws/deploy.yaml
