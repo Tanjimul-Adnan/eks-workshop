@@ -1,10 +1,5 @@
-<<<<<<< HEAD
 name: "eks-workshop-terraform"
-on: 
-=======
-name: "eks-terraform"
-"on":
->>>>>>> staging
+on:
   push:
     branches:
      - main
@@ -16,16 +11,14 @@ name: "eks-terraform"
      - main
     paths:
      - 'terraform/**' 
+  workflow_dispatch:
+
 env:
  AWS_ACCESS_KEY_ID: ${{ secrets.AWS_ACCESS_KEY_ID }}
  AWS_SECRET_ACCESS_KEY: ${{ secrets.AWS_SECRET_ACCESS_KEY }}
  BUCKET_TF_STATE: ${{ secrets.BUCKET_TF_STATE }}  
  AWS_REGION: us-east-2 
-<<<<<<< HEAD
- EKS_CLUSTER: eks-workshop
-=======
  EKS_CLUSTER: eks-workshop-cluster
->>>>>>> staging
 
 jobs:
     terraform:
@@ -40,16 +33,9 @@ jobs:
             - name: Checkout source code
               uses: actions/checkout@v4
             - name: Setup Terraform
-<<<<<<< HEAD
               uses: hashicorp/setup-terraform@v3
               with:
-               terraform_version: 1.9.0 # <-- Update this line to a newer version
-
-=======
-              uses: hashicorp/setup-terraform@v2
-              with:
                 terraform_version: 1.14.8
->>>>>>> staging
             - name: "Terraform Init"
               id: init
               run: terraform init -backend-config="bucket=$BUCKET_TF_STATE"
