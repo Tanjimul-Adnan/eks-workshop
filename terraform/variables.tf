@@ -15,3 +15,9 @@ variable "cluster_name" {
   default     = "retail-store-cluster"
   description = "Name designation of the Amazon EKS cluster"
 }
+
+variable "argocd_hostname" {
+  type        = string
+  default     = "argocd.local"
+  description = "Hostname used by the Argo CD ingress"
+}
