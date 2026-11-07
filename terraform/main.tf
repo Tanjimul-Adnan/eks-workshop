@@ -14,6 +14,15 @@ terraform {
       version = "~> 2.0"
     }
   }
+
+  # Replace these placeholder strings with your active AWS configuration elements
+  backend "s3" {
+    bucket         = ""
+    key            = "gitops/retail-store/terraform.tfstate"
+    region         = "us-east-2"
+    dynamodb_table = "YOUR-RETAIL-STORE-TFSTATE-LOCKS"
+    encrypt        = true
+  }
 }
 
 provider "aws" {
