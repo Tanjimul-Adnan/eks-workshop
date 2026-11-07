@@ -15,6 +15,33 @@ terraform {
   backend "s3" {
     bucket         = "YOUR-RETAIL-STORE-TFSTATE-BUCKET"
     key            = "gitops/retail-store/terraform.tfstate"
+    region         = "us-east-1"
+    dynamodb_table = "YOUR-RETAIL-STORE-TFSTATE-LOCKS"
+    encrypt        = true
+  }
+}
+
+provider "aws" {
+  region = var.aws_region
+}
+
+terraform {
+  required_version = ">= 1.5.0"
+  required_providers {
+    aws = {
+      source  = "hashicorp/aws"
+      version = "~> 5.0"
+    }
+    kubernetes = {
+      source  = "hashicorp/kubernetes"
+      version = "~> 2.0"
+    }
+  }
+
+  # Replace these placeholder strings with your active AWS configuration elements
+  backend "s3" {
+    bucket         = "YOUR-RETAIL-STORE-TFSTATE-BUCKET"
+    key            = "gitops/retail-store/terraform.tfstate"
     region         = "us-east-2"
     dynamodb_table = "YOUR-RETAIL-STORE-TFSTATE-LOCKS"
     encrypt        = true

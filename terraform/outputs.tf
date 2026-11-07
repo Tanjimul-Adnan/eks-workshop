@@ -1,3 +1,8 @@
+variable "region" {
+  description = "AWS region"
+  type        = string
+}
+
 output "cluster_endpoint" {
   value       = module.eks.cluster_endpoint
   description = "API Endpoint for cluster administration"
