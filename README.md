@@ -1,9 +1,9 @@
-# Terraform code 
+Terraform code 
 
-## Maintain vpc & eks with terraform for vprofile project
+## Maintain vpc & eks with terraform eks-shop
 
 ## Tools required
-Terraform version 1.6.3
+Terraform version 1.14.8
 
 ### Steps
 * terraform init
