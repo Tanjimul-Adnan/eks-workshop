@@ -50,12 +50,12 @@ resource "helm_release" "argocd" {
   ]
 }
 
-resource "kubernetes_manifest" "retail_store_application" {
+resource "kubernetes_manifest" "retail_shop_root_application" {
   manifest = {
     apiVersion = "argoproj.io/v1alpha1"
     kind       = "Application"
     metadata = {
-      name      = "retail-store-app"
+      name      = "retail-shop-root"
       namespace = "argocd"
       finalizers = [
         "resources-finalizer.argocd.argoproj.io"
@@ -64,13 +64,17 @@ resource "kubernetes_manifest" "retail_store_application" {
     spec = {
       project = "default"
       source = {
-        repoURL        = "https://github.com/aws-containers/retail-store-sample-app.git"
-        targetRevision = "HEAD"
-        path           = "deployment/kubernetes"
+        repoURL        = var.gitops_repository_url
+        targetRevision = var.gitops_target_revision
+        path           = "bootstrap"
+        directory = {
+          recurse = true
+          include = "retail-shop-application.yaml"
+        }
       }
       destination = {
         server    = "https://kubernetes.default.svc"
-        namespace = "retail-store"
+        namespace = "argocd"
       }
       syncPolicy = {
         automated = {
