@@ -1,14 +1,17 @@
 variable "aws_region" {
-  type    = string
-  default = "us-east-2"
+  type        = string
+  default     = "us-east-1"
+  description = "The target AWS Region for all core infrastructure"
 }
 
 variable "environment" {
-  type    = string
-  default = "dev"
+  type        = string
+  default     = "dev"
+  description = "Deployment stage tag name prefix"
 }
 
 variable "cluster_name" {
-  type    = string
-  default = "retail-store-cluster"
+  type        = string
+  default     = "retail-store-cluster"
+  description = "Name designation of the Amazon EKS cluster"
 }
