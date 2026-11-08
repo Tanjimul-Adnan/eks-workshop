@@ -32,14 +32,23 @@ jobs:
     terraform:
         name: "apply terraform code changes"
         runs-on: ubuntu-latest
-        defaults:
-            run:
-                shell: bash
-                working-directory: ./terraform/terraform
-     
         steps:
             - name: Checkout source code
               uses: actions/checkout@v4
+            - name: Set Terraform directory
+              id: terraform-dir
+              run: |
+                set -euo pipefail
+                if test -f "${GITHUB_WORKSPACE}/terraform/terraform/main.tf"; then
+                  echo "path=${GITHUB_WORKSPACE}/terraform/terraform" >> "${GITHUB_OUTPUT}"
+                elif test -f "${GITHUB_WORKSPACE}/terraform/main.tf"; then
+                  echo "path=${GITHUB_WORKSPACE}/terraform" >> "${GITHUB_OUTPUT}"
+                elif test -f "${GITHUB_WORKSPACE}/main.tf"; then
+                  echo "path=${GITHUB_WORKSPACE}" >> "${GITHUB_OUTPUT}"
+                else
+                  echo "::error::Could not find a Terraform configuration with main.tf"
+                  exit 1
+                fi
             - name: Setup Terraform
               uses: hashicorp/setup-terraform@v3
               with:
@@ -48,6 +57,7 @@ jobs:
             - name: "Terraform Init"
               id: init
               run: |
+                cd "${{ steps.terraform-dir.outputs.path }}"
                 terraform init -input=false \
                   -backend-config="bucket=$BUCKET_TF_STATE" \
                   -backend-config="key=gitops/retail-store/terraform.tfstate" \
@@ -56,14 +66,20 @@ jobs:
             - name: Terraform format 
               id: fmt
               if: github.event_name != 'push' || github.ref != 'refs/heads/stage'
-              run: terraform fmt -check
+              run: |
+                cd "${{ steps.terraform-dir.outputs.path }}"
+                terraform fmt -check
             - name: "Terraform validate"
               id: validate
               if: github.event_name != 'push' || github.ref != 'refs/heads/stage'
-              run: terraform validate
+              run: |
+                cd "${{ steps.terraform-dir.outputs.path }}"
+                terraform validate
             - name: "Terraform plan"
               id: plan
-              run: terraform plan -no-color -input=false -out planfile
+              run: |
+                cd "${{ steps.terraform-dir.outputs.path }}"
+                terraform plan -no-color -input=false -out planfile
               continue-on-error: true
             - name: Terraform plan status
               if: steps.plan.outcome ==  'failure'
@@ -73,7 +89,7 @@ jobs:
               if: github.event_name == 'pull_request'
               with:
                 name: terraform-plan
-                path: terraform/terraform/planfile
+                path: ${{ steps.terraform-dir.outputs.path }}/planfile
 
     apply:
         name: "apply terraform changes after pull request merge"
@@ -90,8 +106,17 @@ jobs:
             - name: Verify Terraform directory
               run: |
                 set -euo pipefail
-                test -d "${GITHUB_WORKSPACE}/terraform/terraform"
-                ls -la "${GITHUB_WORKSPACE}/terraform/terraform"
+                if test -f "${GITHUB_WORKSPACE}/terraform/terraform/main.tf"; then
+                  echo "TF_DIR=${GITHUB_WORKSPACE}/terraform/terraform" >> "${GITHUB_ENV}"
+                elif test -f "${GITHUB_WORKSPACE}/terraform/main.tf"; then
+                  echo "TF_DIR=${GITHUB_WORKSPACE}/terraform" >> "${GITHUB_ENV}"
+                elif test -f "${GITHUB_WORKSPACE}/main.tf"; then
+                  echo "TF_DIR=${GITHUB_WORKSPACE}" >> "${GITHUB_ENV}"
+                else
+                  echo "::error::Could not find a Terraform configuration with main.tf"
+                  exit 1
+                fi
+                ls -la "${TF_DIR:-${GITHUB_WORKSPACE}}"
             - name: Configure AWS credentials
               uses: aws-actions/configure-aws-credentials@v2
               with:
@@ -103,14 +128,14 @@ jobs:
               uses: actions/download-artifact@v4
               with:
                 name: terraform-plan
-                path: terraform/terraform
+                path: ${{ env.TF_DIR }}
             - name: Setup Terraform
               uses: hashicorp/setup-terraform@v3
               with:
                 terraform_version: 1.14.8
             - name: Terraform Init
               run: |
-                cd "${GITHUB_WORKSPACE}/terraform/terraform"
+                cd "${TF_DIR}"
                 terraform init -input=false \
                   -backend-config="bucket=$BUCKET_TF_STATE" \
                   -backend-config="key=gitops/retail-store/terraform.tfstate" \
@@ -118,5 +143,5 @@ jobs:
                   -backend-config="use_lockfile=true"
             - name: Terraform apply
               run: |
-                cd "${GITHUB_WORKSPACE}/terraform/terraform"
+                cd "${TF_DIR}"
                 terraform apply -auto-approve -input=false -parallelism=1 planfile
