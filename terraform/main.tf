@@ -17,7 +17,7 @@ terraform {
 
   # Replace these placeholder strings with your active AWS configuration elements
   backend "s3" {
-    bucket         = ""
+    bucket         = "vprofile2920"
     key            = "gitops/retail-store/terraform.tfstate"
     region         = "us-east-2"
     dynamodb_table = "YOUR-RETAIL-STORE-TFSTATE-LOCKS"
