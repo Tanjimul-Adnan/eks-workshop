@@ -17,11 +17,11 @@ terraform {
 
   # Replace these placeholder strings with your active AWS configuration elements
   backend "s3" {
-    bucket         = ""
-    key            = "gitops/retail-store/terraform.tfstate"
-    region         = "us-east-2"
-    dynamodb_table = "YOUR-RETAIL-STORE-TFSTATE-LOCKS"
-    encrypt        = true
+    bucket       = "vprofile2920"
+    key          = "gitops/retail-store/terraform.tfstate"
+    region       = "us-east-2"
+    use_lockfile = true
+    encrypt      = true
   }
 }
 
@@ -72,21 +72,4 @@ module "data_security" {
   source            = "./modules/data_security"
   environment       = var.environment
   oidc_provider_arn = module.eks.oidc_provider_arn
-}
-
-resource "helm_release" "argocd" {
-  name             = "argocd"
-  repository       = "https://argoproj.github.io/argo-helm"
-  chart            = "argo-cd"
-  namespace        = "argocd"
-  create_namespace = true
-  wait             = true
-
-  depends_on = [module.eks]
-}
-
-resource "kubernetes_manifest" "retail_store_application" {
-  manifest = yamldecode(file("${path.module}/argocd-application.yaml"))
-
-  depends_on = [helm_release.argocd]
 }
