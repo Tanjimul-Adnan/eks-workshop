@@ -34,7 +34,7 @@ resource "helm_release" "argocd" {
       }
       server = {
         ingress = {
-          enabled          = true
+          enabled          = false
           ingressClassName = "nginx"
           hostname         = var.argocd_hostname
           annotations = {
