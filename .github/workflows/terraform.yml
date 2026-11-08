@@ -84,14 +84,14 @@ jobs:
           github.event.action == 'closed' &&
           github.event.pull_request.merged == true &&
           github.base_ref == 'main'
-        defaults:
-            run:
-                shell: bash
-                working-directory: ./terraform/terraform
-
         steps:
             - name: Checkout source code
               uses: actions/checkout@v4
+            - name: Verify Terraform directory
+              run: |
+                set -euo pipefail
+                test -d "${GITHUB_WORKSPACE}/terraform/terraform"
+                ls -la "${GITHUB_WORKSPACE}/terraform/terraform"
             - name: Configure AWS credentials
               uses: aws-actions/configure-aws-credentials@v2
               with:
@@ -110,10 +110,13 @@ jobs:
                 terraform_version: 1.14.8
             - name: Terraform Init
               run: |
+                cd "${GITHUB_WORKSPACE}/terraform/terraform"
                 terraform init -input=false \
                   -backend-config="bucket=$BUCKET_TF_STATE" \
                   -backend-config="key=gitops/retail-store/terraform.tfstate" \
                   -backend-config="region=$AWS_REGION" \
                   -backend-config="use_lockfile=true"
             - name: Terraform apply
-              run: terraform apply -auto-approve -input=false -parallelism=1 planfile
+              run: |
+                cd "${GITHUB_WORKSPACE}/terraform/terraform"
+                terraform apply -auto-approve -input=false -parallelism=1 planfile
